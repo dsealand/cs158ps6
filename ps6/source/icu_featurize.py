@@ -1,7 +1,7 @@
 """
-Author      : Yi-Chieh Wu
+Author      : Arjun Natarajan, Daniel Sealand
 Class       : HMC CS 158
-Date        : 2020 Feb 27
+Date        : 11 March 2020
 Description : Survival of ICU Patients
 
 This code is adapted from course material by Jenna Wiens (UMichigan).
@@ -47,10 +47,8 @@ import tests
 NJOBS = 4           # number of jobs to run in parallel
 RANDOM_SEED = 3     # seed for train_test_split
 
-### ========== TODO : START ========== ###
 # after part a : change to 2500 records
-NRECORDS = 1        # number of patient records
-### ========== TODO : END ========== ###
+NRECORDS = 2500        # number of patient records
 
 FEATURES_TRAIN_FILENAME, LABELS_TRAIN_FILENAME, \
     FEATURES_TEST_FILENAME, LABELS_TEST_FILENAME = \
@@ -151,12 +149,37 @@ class Vectorizer(BaseEstimator, TransformerMixin):
         
         features = {}
         
-        ### ========== TODO : START ========== ###
-        # part a : feature data record of one patient
-        # implement in sandbox below, then copy-paste here
         
-        pass
-        ### ========== TODO : END ========== ###
+        static_vars = config['static']
+        timeseries_vars = config['timeseries']
+
+        # replace unknown values (-1) with np.nan
+        # hint: use df.replace(dict)
+        # professor's solution: 1 line
+
+        df = df.replace(-1, np.nan)
+
+        # process time-invariant variables
+        # keep time-invariant series
+        # nothing to implement here
+        static = df[df['Variable'].isin(static_vars)]
+        for var in static_vars :
+            values = static[static['Variable'] == var].Value
+            features[var] = values.iloc[0]
+
+        # process time series variables
+        # convert time series values to single mean
+        # use above code as a template
+        # professor's solution: 4 lines
+        timeseries = df[df['Variable'].isin(timeseries_vars)]
+        for var in timeseries_vars :
+            values = timeseries[timeseries['Variable'] == var]
+            if values.empty:
+                mean = np.nan
+            else:
+                mean = values['Value'].mean()
+            features['mean_{}'.format(var)] = mean
+
         
         return features
     
@@ -213,7 +236,7 @@ class Vectorizer(BaseEstimator, TransformerMixin):
 # Once correct, copy code into Vectorizer._process_record(...)
 # and recomment this block.
 
-"""
+'''
 df_features, df_labels = get_raw_data(icu_config.RAW_DATA_DIR, n=1)
 
 rid = df_labels['RecordID'][0] # 132539
@@ -224,12 +247,11 @@ features = {}
 static_vars = config['static']
 timeseries_vars = config['timeseries']
 
-### ========== TODO : START ========== ###
 # replace unknown values (-1) with np.nan
 # hint: use df.replace(dict)
 # professor's solution: 1 line
 
-### ========== TODO : END ========== ###
+df = df.replace(-1, np.nan)
 
 # process time-invariant variables
 # keep time-invariant series
@@ -239,17 +261,22 @@ for var in static_vars :
     values = static[static['Variable'] == var].Value
     features[var] = values.iloc[0]
 
-### ========== TODO : START ========== ###
 # process time series variables
 # convert time series values to single mean
 # use above code as a template
 # professor's solution: 4 lines
-
-### ========== TODO : END ========== ###
+timeseries = df[df['Variable'].isin(timeseries_vars)]
+for var in timeseries_vars :
+    values = timeseries[timeseries['Variable'] == var]
+    if values.empty:
+        mean = np.nan
+    else:
+        mean = values['Value'].mean()
+    features['mean_{}'.format(var)] = mean
 
 # test answer
 tests.test_process_record(features)
-"""
+'''
 
 
 def main() :
