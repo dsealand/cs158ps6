@@ -76,15 +76,31 @@ def score(y_true, y_score, metric='accuracy') :
     y_pred = np.sign(y_score)
     y_pred[y_pred == 0] = 1 # map points on hyperplane to +1
     
-    ### ========== TODO : START ========== ###
     # part a : compute classifier performance for specified metric
     # professor's solution: 16 lines
     
     # compute confusion matrix
-    
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred, labels=[-1,1]).ravel()
+
     # compute scores
+    try:
+        if metric == "accuracy": 
+            return (tp + tn)/(tp + fn + fp + tn)
+        elif metric == "auroc":
+            return roc_auc_score(y_true, y_score)
+        elif metric == "f1_score":
+            precision = tp/(tp+fp)
+            recall = tp/(tp+fn)
+            return 2 * (precision * recall)/(precision + recall)
+        elif metric == "sensitivity" or metric == 'recall':
+            return tp/(tp + fn)
+        elif metric == "specificity":
+            return tn/(tn + fp)
+        elif metric == "precision":
+            return tp/(tp + fp)
+    except ZeroDivisionError:
+        return 0
     
-    ### ========== TODO : END ========== ###
 
 
 def plot_cv_results(results, scorers, param_name) :
