@@ -83,23 +83,35 @@ def score(y_true, y_score, metric='accuracy') :
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred, labels=[-1,1]).ravel()
 
     # compute scores
-    try:
-        if metric == "accuracy": 
-            return (tp + tn)/(tp + fn + fp + tn)
-        elif metric == "auroc":
-            return roc_auc_score(y_true, y_score)
-        elif metric == "f1_score":
+    if metric == "accuracy": 
+        x = (tp + tn)
+        y = (tp + fn + fp + tn)
+    elif metric == "auroc":
+        return roc_auc_score(y_true, y_score)
+    elif metric == "f1_score":
+        if tp+fp == 0:
+            precision = 0
+        else:
             precision = tp/(tp+fp)
+        if tp + fn == 0:
+            recall = 0
+        else:
             recall = tp/(tp+fn)
-            return 2 * (precision * recall)/(precision + recall)
-        elif metric == "sensitivity" or metric == 'recall':
-            return tp/(tp + fn)
-        elif metric == "specificity":
-            return tn/(tn + fp)
-        elif metric == "precision":
-            return tp/(tp + fp)
-    except ZeroDivisionError:
+        x = 2 * (precision * recall)
+        y = precision + recall
+    elif metric == "sensitivity" or metric == 'recall':
+        x = tp
+        y = (tp + fn)
+    elif metric == "specificity":
+        x = tn
+        y = (tn + fp)
+    elif metric == "precision":
+        x = tp
+        y = (tp + fp)
+    if y == 0:
         return 0
+    else:
+        return x/y
     
 
 
@@ -293,7 +305,16 @@ def main() :
     # professor's solution: 12 lines
     
     for scorer in sorted(scoring) :
-        pass
+        print("{}............................".format(scorer))
+        train = results["mean_train_{}".format(scorer)]
+        test = results["mean_test_{}".format(scorer)]
+        maxTest = np.max(test)
+        maxTestIndex = np.argmax(test)
+        maxTrain = train[maxTestIndex]
+        optC = param_grid['clf__C'][maxTestIndex]
+        print("Train Score {}".format(maxTrain))
+        print("Test Score {}".format(maxTest))
+        print("C {}".format(optC))
     
     ### ========== TODO : END ========== ###
     
