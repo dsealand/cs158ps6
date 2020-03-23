@@ -1,7 +1,7 @@
 """
-Author      : Yi-Chieh Wu
+Author      : Arjun Natarajan and Daniel Sealand
 Class       : HMC CS 158
-Date        : 2020 Feb 19
+Date        : 11 March 2020
 Description : Survival of ICU Patients
 
 This code is adapted from course material by Jenna Wiens (UMichigan).
@@ -215,7 +215,6 @@ def main():
     
     n, d = X.shape
     
-    ### ========== TODO : START ========== ###
     # part a : make and tune pipelines
     # professor's solution: 15-25 lines
     #
@@ -291,33 +290,42 @@ def main():
         # step 1
         # make pipeline and parameter grid
         # professor's solution: 3-5 lines
-        pass
+        imputer = preprocessors.Imputer()
+        scaler = preprocessors.Scaler()
+        clf = getattr(classifiers, clf_str)(n, d)
+        steps = [('imputer', imputer),('scaler', scaler),('clf', clf)]
+        pipe, param_grid = make_pipeline_and_grid(steps)
         
         # step 2
         # tune hyperparameters using CV
         # professor's solution: 3-5 lines
-        pass
+        search = GridSearchCV(pipe, param_grid,
+                          scoring=scoring, cv=cv, refit='auroc',
+                          return_train_score=True, n_jobs = -1)
+        search.fit(X, y)
+        results = search.cv_results_
         
         # step 3
         # print optimal hyperparameter setting
         # professor's solution: 1 line
-        pass
+        print('Classifier: {}, Optimal Hyperparameter:{}'.format(clf_str, search.best_params_))
         
         # step 4
         # store results
         dct = {}
         for scorer in sorted(scoring) :
             # professor's solution: 3 lines
-            pass
-            
+            keys = ["mean_train_{}".format(scorer), "mean_test_{}".format(scorer), 
+                    "std_train_{}".format(scorer), "std_test_{}".format(scorer)]
+            for key in keys:
+                dct[key] = search.cv_results_[key][search.best_index_]
             scores[clf_str] = dct
         
         # dump to file
         # uncomment the line to dump best estimator to file
         # assumes you named your GridSearchCV object 'search'
         filename = os.path.join(icu_config.PICKLE_DIR, f'{clf_str}.joblib')
-        # dump(search.best_estimator_, filename)
-    ### ========== TODO : END ========== ###
+        dump(search.best_estimator_, filename)
     
     print()
     

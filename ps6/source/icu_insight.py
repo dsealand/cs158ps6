@@ -94,7 +94,15 @@ def get_test_scores(clf, X, y, n_bootstraps=1, metrics=['accuracy']) :
     # part a : find score on on full data set
     #          find bootstrap scores on resampled data set
     # professor's solution: 7 lines
-    #
+    for metric in metrics:
+        scored = score(y, y_pred, metric)
+        scores[metric] = scored
+        bootScores = []
+        for i in range(n_bootstraps):
+            y_boot, y_true_boot = resample(y_pred, y, random_state = i)
+            score_boot = score(y_true_boot, y_boot, metric)
+            bootScores.append(score_boot)
+        scores["{}_boot".format(metric)] = bootScores
     # hint: use sklearn.utils.resample to sample
     #       set random_state to the bootstrap iteration
     #           to generate same sampling across metrics
@@ -227,7 +235,6 @@ def main():
         # compute scores
         test_scores = get_test_scores(pipe, X_test, y_test, n_bootstraps, METRICS)
         
-        ### ========== TODO : START ========== ###
         # part b : summarize to dictionary
         # professor's solution: 6 lines
         #
@@ -249,10 +256,12 @@ def main():
         # hint: use np.percentile to compute percentiles
         
         scores_clf = {}
+        for metric in METRICS:
+            scores_clf[metric] = test_scores[metric]
+            scores_clf['lower_{}'.format(metric)] = np.percentile(test_scores['{}_boot'.format(metric)], 0.025)
+            scores_clf['upper_{}'.format(metric)] = np.percentile(test_scores['{}_boot'.format(metric)], 0.975)
         
-        
-        ### ========== TODO : END ========== ###
-        
+                
         # save scores for current classifier
         scores[clf_str] = scores_clf
     
@@ -277,9 +286,15 @@ def main():
     # part e : identify important features
     #          print to screen
     # professor's solution: 8 lines
+    coef_sorted, feature_names_sorted = zip(*sorted(list(zip(coef, feature_names))))
+    print(coef_sorted)
+    print('increased risk')
+    for i in range(5):
+        print('{}th most important feature: {} and coefficient: {}'.format(i,feature_names_sorted[i],coef_sorted[i]))
     
-    
-    
+    print('decreased risk')
+    for i in range(len(coef_sorted) - 5, len(coef_sorted)):
+        print('{}th most important feature: {} and coefficient: {}'.format(i,feature_names_sorted[i],coef_sorted[i]))
     ### ========== TODO : START ========== ###
     
     print()

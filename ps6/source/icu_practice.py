@@ -298,7 +298,6 @@ def main() :
     # plot results
     plot_cv_results(results, search.scorer_, param_name='param_clf__C')
     
-    ### ========== TODO : START ========== ###
     # part c : find optimal hyperparameter setting for each metric
     #          report corresponding mean train score and test score
     #          everything you need is in results variable
@@ -316,7 +315,6 @@ def main() :
         print("Test Score {}".format(maxTest))
         print("C {}".format(optC))
     
-    ### ========== TODO : END ========== ###
     
     print()
 
