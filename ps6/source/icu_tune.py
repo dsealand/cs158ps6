@@ -1,7 +1,7 @@
 """
 Author      : Arjun Natarajan and Daniel Sealand
 Class       : HMC CS 158
-Date        : 11 March 2020
+Date        : 23 March 2020
 Description : Survival of ICU Patients
 
 This code is adapted from course material by Jenna Wiens (UMichigan).

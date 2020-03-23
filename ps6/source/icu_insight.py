@@ -1,7 +1,7 @@
 """
-Author      : Yi-Chieh Wu
+Author      : Arjun Natarajan and Daniel Sealand
 Class       : HMC CS 158
-Date        : 2020 Feb 19
+Date        : 2020 Mar 23
 Description : Survival of ICU Patients
 
 This code is adapted from course material by Jenna Wiens (UMichigan).
